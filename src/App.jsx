@@ -1,7 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Trophy, Home, Play, BookOpen, Trash2 } from 'lucide-react';
 
+// Add CSS for safe areas
+const safeAreaStyles = `
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  @supports (height: 100dvh) {
+    .dvh-full {
+      height: 100dvh;
+    }
+  }
+`;
+
 const SightWordsApp = () => {
+  // Add styles to document head
+  useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = safeAreaStyles;
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
   // Word lists (cleaned of duplicates)
   const wordLists = {
     'Pre-K': ["the", "to", "and", "a", "I", "you", "it", "in", "said", "for", "up", "look", "is", "go", "we", "little", "down", "can", "see", "not", "one", "my", "me", "big", "come", "blue", "red", "where", "yellow", "he", "was", "that", "she", "on", "they", "but", "at", "with", "all", "there", "out", "be", "have", "am", "do", "did", "what", "so", "how", "tell", "know", "work", "call", "myself", "over", "before", "sleep", "five", "try", "start", "ten"],
@@ -154,9 +177,7 @@ const SightWordsApp = () => {
     setCurrentView('game');
   };
 
-  const goToNextWord = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const goToNextWord = () => {
     if (currentWordIndex < gameWords.length - 1) {
       setCurrentWordIndex(currentWordIndex + 1);
     } else {
@@ -167,9 +188,7 @@ const SightWordsApp = () => {
     }
   };
 
-  const goToPrevWord = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const goToPrevWord = () => {
     if (currentWordIndex > 0) {
       setCurrentWordIndex(currentWordIndex - 1);
     }
@@ -307,16 +326,9 @@ const SightWordsApp = () => {
     const progressPercent = Math.round(((currentWordIndex + 1) / gameWords.length) * 100);
 
     return (
-      <div 
-        className="h-screen bg-gradient-to-b from-green-400 to-blue-500 flex flex-col w-full overflow-hidden"
-        style={{ 
-          height: '100vh',
-          minHeight: '100vh',
-          maxHeight: '100vh'
-        }}
-      >
+      <div className="fixed inset-0 bg-gradient-to-b from-green-400 to-blue-500 flex flex-col">
         {/* Top Bar */}
-        <div className="flex justify-between items-center p-3 md:p-4 bg-white bg-opacity-20 w-full flex-shrink-0">
+        <div className="flex justify-between items-center p-3 md:p-4 bg-white bg-opacity-20 flex-shrink-0">
           <div className="text-white font-bold text-base md:text-lg">
             {currentWordIndex + 1}/{gameWords.length}
           </div>
@@ -328,53 +340,38 @@ const SightWordsApp = () => {
           </div>
         </div>
 
-        {/* Word Card */}
-        <div className="flex-1 flex items-center justify-center p-4 md:p-8 w-full min-h-0">
-          <div className="bg-white rounded-3xl shadow-2xl w-full min-h-[200px] sm:min-h-[300px] md:min-h-[400px] flex items-center justify-center">
-            <div className="text-3xl sm:text-5xl md:text-8xl font-bold text-gray-800 leading-none text-center px-4 py-8 break-words">
+        {/* Word Card - Takes remaining space */}
+        <div className="flex-1 flex items-center justify-center p-4 md:p-8 min-h-0">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl aspect-[4/3] flex items-center justify-center">
+            <div className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-bold text-gray-800 leading-none text-center px-4 py-4 break-words">
               {currentWord}
             </div>
           </div>
         </div>
 
-        {/* Bottom Navigation - Fixed height to prevent browser nav interference */}
-        <div 
-          className="flex justify-between items-center p-3 md:p-4 w-full flex-shrink-0"
-          style={{ 
-            paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
-            minHeight: '80px'
-          }}
-        >
+        {/* Bottom Navigation - Fixed height */}
+        <div className="flex justify-between items-center p-4 md:p-6 flex-shrink-0 pb-safe">
           <button
             onClick={goToPrevWord}
-            onMouseDown={(e) => e.preventDefault()}
             disabled={currentWordIndex === 0}
-            type="button"
-            className="select-none bg-white bg-opacity-20 hover:bg-opacity-30 disabled:opacity-50 text-white p-3 md:p-4 rounded-full transition-all cursor-pointer touch-manipulation"
-            style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+            className="bg-white bg-opacity-20 hover:bg-opacity-30 active:bg-opacity-40 disabled:opacity-50 text-white p-4 md:p-5 rounded-full transition-all"
           >
-            <ChevronLeft size={24} className="md:w-8 md:h-8 pointer-events-none" />
+            <ChevronLeft size={28} className="md:w-8 md:h-8" />
           </button>
 
           <button
             onClick={() => setCurrentView('menu')}
-            onMouseDown={(e) => e.preventDefault()}
-            type="button"
-            className="select-none bg-red-500 hover:bg-red-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg font-bold transition-colors flex items-center gap-2 cursor-pointer touch-manipulation"
-            style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+            className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white px-6 py-3 md:px-8 md:py-4 rounded-lg font-bold transition-colors flex items-center gap-2"
           >
-            <Home size={18} className="md:w-6 md:h-6 pointer-events-none" />
-            <span className="hidden sm:inline pointer-events-none">Menu</span>
+            <Home size={20} className="md:w-6 md:h-6" />
+            <span className="hidden sm:inline">Menu</span>
           </button>
 
           <button
             onClick={goToNextWord}
-            onMouseDown={(e) => e.preventDefault()}
-            type="button"
-            className="select-none bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-3 md:p-4 rounded-full transition-all cursor-pointer touch-manipulation"
-            style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+            className="bg-white bg-opacity-20 hover:bg-opacity-30 active:bg-opacity-40 text-white p-4 md:p-5 rounded-full transition-all"
           >
-            <ChevronRight size={24} className="md:w-8 md:h-8 pointer-events-none" />
+            <ChevronRight size={28} className="md:w-8 md:h-8" />
           </button>
         </div>
       </div>
