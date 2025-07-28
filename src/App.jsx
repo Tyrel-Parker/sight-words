@@ -39,7 +39,8 @@ const SightWordsApp = () => {
     const savedScores = {};
     gradeOrder.forEach(grade => {
       try {
-        savedScores[grade] = JSON.parse(localStorage?.getItem(`highScores_${grade}`) || '[]');
+        const stored = localStorage?.getItem(`highScores_${grade}`);
+        savedScores[grade] = stored ? JSON.parse(stored) : [];
       } catch (e) {
         savedScores[grade] = [];
       }
@@ -153,7 +154,9 @@ const SightWordsApp = () => {
     setCurrentView('game');
   };
 
-  const goToNextWord = () => {
+  const goToNextWord = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (currentWordIndex < gameWords.length - 1) {
       setCurrentWordIndex(currentWordIndex + 1);
     } else {
@@ -164,7 +167,9 @@ const SightWordsApp = () => {
     }
   };
 
-  const goToPrevWord = () => {
+  const goToPrevWord = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (currentWordIndex > 0) {
       setCurrentWordIndex(currentWordIndex - 1);
     }
@@ -302,9 +307,16 @@ const SightWordsApp = () => {
     const progressPercent = Math.round(((currentWordIndex + 1) / gameWords.length) * 100);
 
     return (
-      <div className="min-h-screen bg-gradient-to-b from-green-400 to-blue-500 flex flex-col w-full">
+      <div 
+        className="h-screen bg-gradient-to-b from-green-400 to-blue-500 flex flex-col w-full overflow-hidden"
+        style={{ 
+          height: '100vh',
+          minHeight: '100vh',
+          maxHeight: '100vh'
+        }}
+      >
         {/* Top Bar */}
-        <div className="flex justify-between items-center p-3 md:p-4 bg-white bg-opacity-20 w-full">
+        <div className="flex justify-between items-center p-3 md:p-4 bg-white bg-opacity-20 w-full flex-shrink-0">
           <div className="text-white font-bold text-base md:text-lg">
             {currentWordIndex + 1}/{gameWords.length}
           </div>
@@ -317,37 +329,52 @@ const SightWordsApp = () => {
         </div>
 
         {/* Word Card */}
-        <div className="flex-1 flex items-center justify-center p-4 md:p-8 w-full">
-          <div className="bg-white rounded-3xl shadow-2xl w-full min-h-[300px] md:min-h-[400px] flex items-center justify-center">
-            <div className="text-4xl sm:text-6xl md:text-8xl font-bold text-gray-800 leading-none text-center px-4 py-8 break-words">
+        <div className="flex-1 flex items-center justify-center p-4 md:p-8 w-full min-h-0">
+          <div className="bg-white rounded-3xl shadow-2xl w-full min-h-[200px] sm:min-h-[300px] md:min-h-[400px] flex items-center justify-center">
+            <div className="text-3xl sm:text-5xl md:text-8xl font-bold text-gray-800 leading-none text-center px-4 py-8 break-words">
               {currentWord}
             </div>
           </div>
         </div>
 
-        {/* Bottom Navigation */}
-        <div className="flex justify-between items-center p-3 md:p-4 w-full">
+        {/* Bottom Navigation - Fixed height to prevent browser nav interference */}
+        <div 
+          className="flex justify-between items-center p-3 md:p-4 w-full flex-shrink-0"
+          style={{ 
+            paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+            minHeight: '80px'
+          }}
+        >
           <button
             onClick={goToPrevWord}
+            onMouseDown={(e) => e.preventDefault()}
             disabled={currentWordIndex === 0}
-            className="bg-white bg-opacity-20 hover:bg-opacity-30 disabled:opacity-50 text-white p-3 md:p-4 rounded-full transition-all"
+            type="button"
+            className="select-none bg-white bg-opacity-20 hover:bg-opacity-30 disabled:opacity-50 text-white p-3 md:p-4 rounded-full transition-all cursor-pointer touch-manipulation"
+            style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
           >
-            <ChevronLeft size={24} className="md:w-8 md:h-8" />
+            <ChevronLeft size={24} className="md:w-8 md:h-8 pointer-events-none" />
           </button>
 
           <button
             onClick={() => setCurrentView('menu')}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg font-bold transition-colors flex items-center gap-2"
+            onMouseDown={(e) => e.preventDefault()}
+            type="button"
+            className="select-none bg-red-500 hover:bg-red-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg font-bold transition-colors flex items-center gap-2 cursor-pointer touch-manipulation"
+            style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
           >
-            <Home size={18} className="md:w-6 md:h-6" />
-            <span className="hidden sm:inline">Menu</span>
+            <Home size={18} className="md:w-6 md:h-6 pointer-events-none" />
+            <span className="hidden sm:inline pointer-events-none">Menu</span>
           </button>
 
           <button
             onClick={goToNextWord}
-            className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-3 md:p-4 rounded-full transition-all"
+            onMouseDown={(e) => e.preventDefault()}
+            type="button"
+            className="select-none bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-3 md:p-4 rounded-full transition-all cursor-pointer touch-manipulation"
+            style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
           >
-            <ChevronRight size={24} className="md:w-8 md:h-8" />
+            <ChevronRight size={24} className="md:w-8 md:h-8 pointer-events-none" />
           </button>
         </div>
       </div>
