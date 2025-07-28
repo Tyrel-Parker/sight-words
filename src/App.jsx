@@ -116,13 +116,20 @@ const SightWordsApp = () => {
     setCurrentView('game');
   };
 
-  // Improved navigation functions with useCallback to prevent re-renders
+  // Improved navigation functions with debouncing to prevent double-firing
   const goToNextWord = useCallback((e) => {
     // Prevent any default behavior and stop propagation
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
+
+    // Debounce to prevent rapid multiple calls
+    const now = Date.now();
+    if (goToNextWord.lastCall && now - goToNextWord.lastCall < 200) {
+      return;
+    }
+    goToNextWord.lastCall = now;
 
     if (currentWordIndex < gameWords.length - 1) {
       setCurrentWordIndex(currentWordIndex + 1);
@@ -141,6 +148,13 @@ const SightWordsApp = () => {
       e.stopPropagation();
     }
 
+    // Debounce to prevent rapid multiple calls
+    const now = Date.now();
+    if (goToPrevWord.lastCall && now - goToPrevWord.lastCall < 200) {
+      return;
+    }
+    goToPrevWord.lastCall = now;
+
     if (currentWordIndex > 0) {
       setCurrentWordIndex(currentWordIndex - 1);
     }
@@ -151,6 +165,14 @@ const SightWordsApp = () => {
       e.preventDefault();
       e.stopPropagation();
     }
+
+    // Debounce to prevent rapid multiple calls
+    const now = Date.now();
+    if (goToMenu.lastCall && now - goToMenu.lastCall < 200) {
+      return;
+    }
+    goToMenu.lastCall = now;
+
     setCurrentView('menu');
   }, []);
 
@@ -314,12 +336,11 @@ const SightWordsApp = () => {
           </div>
         </div>
 
-        {/* Bottom Navigation - Simplified button handling */}
+        {/* Bottom Navigation - Single event handler to prevent double-firing */}
         <div className="flex justify-between items-center p-4 md:p-6 flex-shrink-0 pb-safe">
           <button
             type="button"
-            onMouseDown={goToPrevWord}
-            onTouchStart={goToPrevWord}
+            onClick={goToPrevWord}
             disabled={currentWordIndex === 0}
             className="nav-button nav-button-white text-white p-4 md:p-5 rounded-full"
             style={{ 
@@ -333,8 +354,7 @@ const SightWordsApp = () => {
 
           <button
             type="button"
-            onMouseDown={goToMenu}
-            onTouchStart={goToMenu}
+            onClick={goToMenu}
             className="nav-button nav-button-red text-white px-6 py-3 md:px-8 md:py-4 rounded-lg font-bold flex items-center gap-2"
             style={{ 
               WebkitTapHighlightColor: 'transparent',
@@ -348,8 +368,7 @@ const SightWordsApp = () => {
 
           <button
             type="button"
-            onMouseDown={goToNextWord}
-            onTouchStart={goToNextWord}
+            onClick={goToNextWord}
             className="nav-button nav-button-white text-white p-4 md:p-5 rounded-full"
             style={{ 
               WebkitTapHighlightColor: 'transparent',
