@@ -1,540 +1,82 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Trophy, Home, Play, BookOpen } from 'lucide-react';
+export const wordLists = {
+  // Pre-K
+  'Pre-K': ["the", "to", "and", "a", "I", "you", "it", "in", "said", "for", "up", "look", "is", "go", "we", "little", "down", "can", "see", "not", "one", "my", "me", "big", "come", "blue", "red", "where", "yellow", "he", "was", "that", "she", "on", "they", "but", "at", "with", "all", "there", "out", "be", "have", "am", "do", "did", "what", "so", "how", "tell", "know", "work", "call", "myself", "over", "before", "sleep", "five", "try", "start", "ten", "here", "play", "help", "new"],
 
-const SightWordsApp = () => {
-  // Word lists (cleaned of duplicates)
-  const wordLists = {
-    'Pre-K': ["the", "to", "and", "a", "I", "you", "it", "in", "said", "for", "up", "look", "is", "go", "we", "little", "down", "can", "see", "not", "one", "my", "me", "big", "come", "blue", "red", "where", "yellow", "he", "was", "that", "she", "on", "they", "but", "at", "with", "all", "there", "out", "be", "have", "am", "do", "did", "what", "so", "how", "tell", "know", "work", "call", "myself", "over", "before", "sleep", "five", "try", "start", "ten"],
-    'Kindergarten': ["are", "as", "his", "this", "from", "or", "had", "by", "word", "were", "when", "your", "use", "an", "each", "which", "their", "if", "will", "other", "about", "many", "then", "them", "these", "some", "her", "would", "make", "like", "him", "into", "time", "has", "two", "more", "write", "number", "no", "way", "could", "people", "than", "first", "water", "been", "who", "oil", "its", "now", "find", "long", "day", "get", "made", "may", "part"],
-    '1st Grade': ["of", "ask", "just", "off", "any", "does", "every", "goes", "light", "pick", "hurt", "cut", "kind", "live", "very", "around", "don't", "right", "green", "today", "wash", "cold", "only", "better", "hold", "warm", "full", "much", "keep", "got", "six", "never", "seven", "eight", "nine", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"],
-    '2nd Grade': [], // Placeholder for future grades
-    '3rd Grade': [],
-    '4th Grade': [],
-    '5th Grade': [],
-    '6th Grade': [],
-    '7th Grade': [],
-    '8th Grade': [],
-    '9th Grade': [],
-    '10th Grade': [],
-    '11th Grade': [],
-    '12th Grade': []
-  };
+  // Kindergarten
+  'Kindergarten': ["are", "as", "his", "this", "from", "or", "had", "by", "word", "were", "when", "your", "use", "an", "each", "which", "their", "if", "will", "other", "about", "many", "then", "them", "these", "some", "her", "would", "make", "like", "him", "into", "time", "has", "two", "more", "write", "number", "no", "way", "could", "people", "than", "first", "water", "been", "who", "oil", "its", "now", "find", "long", "day", "get", "made", "may", "part", "take", "give", "old"],
 
-  const gradeOrder = ['Pre-K', 'Kindergarten', '1st Grade', '2nd Grade', '3rd Grade', '4th Grade', '5th Grade', '6th Grade', '7th Grade', '8th Grade', '9th Grade', '10th Grade', '11th Grade', '12th Grade'];
+  // 1st Grade
+  '1st Grade': ["of", "ask", "just", "off", "any", "does", "every", "goes", "light", "pick", "hurt", "cut", "kind", "live", "very", "around", "don't", "right", "green", "today", "wash", "cold", "only", "better", "hold", "warm", "full", "much", "keep", "got", "six", "never", "seven", "eight", "nine", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty", "reading", "writing", "math", "science"],
 
-  const [currentView, setCurrentView] = useState('menu'); // 'menu', 'game', 'highscores', 'nameEntry', 'review'
-  const [selectedGrade, setSelectedGrade] = useState('');
-  const [gameWords, setGameWords] = useState([]);
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [startTime, setStartTime] = useState(null);
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const [highScores, setHighScores] = useState({});
-  const [completionTime, setCompletionTime] = useState(0);
-  const [playerName, setPlayerName] = useState('');
-  const [currentScore, setCurrentScore] = useState(null);
-  const nameInputRef = useRef(null);
+  // 2nd Grade
+  '2nd Grade': ["again", "always", "animal", "away", "because", "between", "both", "buy", "change", "close", "different", "even", "example", "fast", "father", "follow", "food", "form", "found", "gave", "great", "group", "hard", "head", "home", "house", "large", "learn", "left", "letter", "mean", "might", "mother", "move", "next", "our", "page", "picture", "place", "point", "pull", "read", "school", "sentence", "show", "sing", "sit", "study", "such", "those", "though", "thought", "three", "together", "turn", "upon", "us", "want", "while", "why", "wish", "world", "write", "year", "along", "best", "call", "live", "sleep"],
 
-  // Load high scores from memory on component mount
-  useEffect(() => {
-    const savedScores = {};
-    gradeOrder.forEach(grade => {
-      try {
-        savedScores[grade] = JSON.parse(localStorage?.getItem(`highScores_${grade}`) || '[]');
-      } catch (e) {
-        savedScores[grade] = [];
-      }
-    });
-    setHighScores(savedScores);
-  }, []);
+  // 3rd Grade
+  '3rd Grade': ["above", "add", "almost", "begin", "began", "being", "below", "book", "bring", "car", "carry", "children", "city", "clean", "country", "done", "draw", "drink", "earth", "eat", "enough", "eyes", "face", "fall", "family", "far", "feet", "few", "four", "girl", "grow", "hear", "high", "hot", "idea", "important", "Indian", "it's", "last", "late", "laugh", "leave", "let", "life", "list", "mile", "miss", "mountains", "near", "night", "often", "once", "open", "own", "paper", "plant", "real", "river", "run", "saw", "sea", "second", "seem", "shall", "side", "small", "something", "sometimes", "song", "soon", "state", "stop", "story", "talk", "took", "tree", "under", "until", "walk", "watch", "white", "without", "young", "across", "behind", "round"],
 
-  // Timer effect
-  useEffect(() => {
-    let interval;
-    if (currentView === 'game' && startTime) {
-      interval = setInterval(() => {
-        setElapsedTime(Date.now() - startTime);
-      }, 100);
-    }
-    return () => clearInterval(interval);
-  }, [currentView, startTime]);
+  // 4th Grade
+  '4th Grade': ["body", "music", "color", "stand", "sun", "questions", "fish", "area", "mark", "dog", "horse", "birds", "problem", "complete", "room", "knew", "since", "ever", "piece", "told", "usually", "didn't", "friends", "easy", "heard", "order", "door", "sure", "become", "top", "ship", "during", "short", "however", "low", "hours", "black", "products", "happened", "whole", "measure", "remember", "early", "waves", "reached", "listen", "wind", "rock", "space", "covered", "several", "himself", "toward", "step", "morning", "passed", "vowel", "true", "hundred", "against", "pattern", "numeral", "table", "north", "slowly", "money", "map", "farm", "pulled", "voice", "seen", "cried", "plan", "notice", "south", "war", "ground", "king", "town", "I'll", "unit", "figure", "certain", "field", "travel", "wood", "fire", "English", "road", "half", "fly", "box", "finally", "wait", "correct", "oh", "quickly", "person", "became", "shown", "minutes", "strong", "verb", "stars", "front", "feel", "fact", "inches", "street", "decided", "contain", "course", "surface", "produce", "building", "ocean", "class", "note", "nothing", "rest", "carefully", "scientists", "inside", "wheels", "stay", "known", "island", "week", "less", "machine", "base", "ago", "stood", "plane", "system", "ran", "boat", "game", "force", "brought", "understand", "common", "explain", "dry", "language", "shape", "deep", "thousands", "yes", "clear", "equation", "yet", "government", "filled", "heat", "check", "object", "rule", "among", "noun", "power", "cannot", "able", "size", "dark", "ball", "material", "special", "heavy", "fine", "pair", "circle", "include", "built", "anything", "arms", "beautiful", "believe", "beside", "bill", "brother", "can't", "cause", "cells", "center", "clothes", "dance", "describe", "developed", "difference", "direction", "discovered", "distance", "divided", "drive", "drop", "edge", "eggs", "energy", "Europe", "exercise", "farmers", "felt", "finished", "flowers", "forest", "general", "gone", "grass", "happy", "heart", "held", "instruments", "interest", "job", "kept", "lay", "legs", "length", "love", "main", "matter", "meet", "members", "million", "mind", "months", "moon", "paint", "paragraph", "past", "perhaps", "picked", "present", "probably", "race", "rain", "raised", "ready", "reason", "record", "region", "represent", "return", "root", "sat", "sign", "simple", "site", "sky", "soft", "square", "store", "subject", "suddenly", "sum", "summer", "syllables", "teacher", "test", "third", "train", "wall", "weather", "west", "whether", "wide", "wild", "window", "winter", "written"],
 
-  // Focus name input when entering name entry view
-  useEffect(() => {
-    if (currentView === 'nameEntry' && nameInputRef.current) {
-      setTimeout(() => {
-        nameInputRef.current.focus();
-      }, 100);
-    }
-  }, [currentView]);
+  // 5th Grade
+  '5th Grade': ["act", "Africa", "age", "already", "although", "amount", "angle", "appear", "baby", "bear", "beat", "bed", "bottom", "bright", "broken", "build", "care", "case", "cat", "century", "consonant", "copy", "couldn't", "count", "cross", "dictionary", "died", "dress", "either", "everyone", "everything", "exactly", "factors", "fight", "fingers", "floor", "fraction", "free", "French", "gold", "hair", "hill", "hole", "hope", "ice", "instead", "iron", "jumped", "killed", "lake", "laughed", "lead", "let's", "lot", "melody", "metal", "method", "middle", "milk", "moment", "nation", "natural", "outside", "per", "phrase", "poor", "possible", "pounds", "pushed", "quiet", "quite", "remain", "result", "ride", "rolled", "sail", "scale", "section", "smiled", "snow", "soil", "solve", "someone", "son", "speak", "speed", "spring", "stone", "surprise", "tall", "temperature", "themselves", "tiny", "trip", "type", "village", "within", "wonder", "alone", "art", "bad", "bank", "bit", "break", "brown", "burning", "business", "captain", "catch", "caught", "cents", "child", "choose", "climbed", "cloud", "coast", "continued", "control", "cool", "cost", "decimal", "desert", "design", "direct", "drawing", "ears", "east", "else", "engine", "England", "equal", "experiment", "express", "feeling", "fell", "flow", "foot", "garden", "gas", "glass", "God", "grew", "history", "human", "hunting", "increase", "information", "itself", "joined", "key", "lady", "law", "least", "lost", "maybe", "mouth", "party", "pay", "period", "plains", "please", "practice", "president", "received", "report", "ring", "rise", "row", "save", "seeds", "sent", "separate", "serve", "shouted", "single", "skin", "statement", "stick", "straight", "strange", "students", "suppose", "symbols", "team", "touch", "trouble", "uncle", "valley", "visit", "wear", "whose", "wire", "woman", "wrote", "yard", "you're", "yourself", "addition", "army", "bell", "belong", "block", "blood", "blow", "board", "bones", "branches", "cattle", "chief", "compare", "compound", "consider", "cook", "corner", "crops", "crowd", "current", "doctor", "dollars", "electric", "elements", "enjoy", "entered", "except", "exciting", "expect", "famous", "fit", "flat", "fruit", "fun", "guess", "hat", "hit", "indicate", "industry", "insects", "interesting", "Japanese", "lie", "lifted", "loud", "major", "mall", "meat", "mine", "modern", "movement", "necessary", "observe", "park", "particular", "planets", "poem", "pole", "position", "process", "property", "provide", "rather", "rhythm", "rich", "safe", "sand", "science", "sell", "send", "sense", "sharp", "shoulder", "sight", "silent", "soldiers", "spot", "spread", "stream", "string", "suggested", "supply", "swim", "terms", "thick", "thin", "thus", "tied", "tone", "trade", "tube", "value", "wasn't", "weight", "wife", "wings", "won't", "action", "actually", "adjective", "afraid", "agreed", "ahead", "allow", "apple", "arrived", "born", "bought", "British", "capital", "chance", "chart", "church", "column", "company", "conditions", "corn", "cotton", "cows", "create", "dead", "deal", "death", "details", "determine", "difficult", "division", "doesn't", "effect", "entire", "especially", "evening", "experience", "factories", "fair", "fear", "fig", "forward", "France", "fresh", "Greek", "gun", "hoe", "huge", "isn't", "led", "level", "located", "march", "match", "molecules", "northern", "nose", "office", "opposite", "oxygen", "plural", "prepared", "pretty", "printed", "radio", "repeated", "rope", "rose", "score", "seat", "settled", "shoes", "shop", "similar", "sir", "sister", "smell", "solution", "southern", "steel", "stretched", "substances", "suffix", "sugar", "tools", "total", "track", "triangle", "truck", "underline", "various", "view", "Washington", "we'll", "western", "win", "women", "workers", "wouldn't", "wrong", "yellow", "furthermore", "however", "therefore", "meanwhile"],
 
-  const formatTime = (ms) => {
-    const seconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    const centiseconds = Math.floor((ms % 1000) / 10);
-    
-    if (minutes > 0) {
-      return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}.${centiseconds.toString().padStart(2, '0')}`;
-    }
-    return `${remainingSeconds}.${centiseconds.toString().padStart(2, '0')}s`;
-  };
+  // 6th Grade
+  '6th Grade': ["analyze", "compare", "contrast", "describe", "explain", "identify", "summarize", "predict", "conclude", "observe", "character", "setting", "plot", "theme", "conflict", "narrator", "fiction", "nonfiction", "biography", "poetry", "fraction", "decimal", "percent", "ratio", "proportion", "area", "perimeter", "volume", "integer", "variable", "ancient", "civilization", "empire", "culture", "religion", "government", "democracy", "citizen", "geography", "continent", "energy", "matter", "solid", "liquid", "gas", "temperature", "weather", "climate", "ecosystem", "habitat", "evidence", "opinion", "fact", "detail", "sequence", "cause", "effect", "problem", "solution", "research", "cite", "quote", "primary", "secondary", "chronological", "data", "graph", "chart", "diagram"],
 
-  const getCombinedWordList = (targetGrade) => {
-    const targetIndex = gradeOrder.indexOf(targetGrade);
-    let combined = [];
-    
-    for (let i = 0; i <= targetIndex; i++) {
-      const grade = gradeOrder[i];
-      if (wordLists[grade] && wordLists[grade].length > 0) {
-        combined = [...combined, ...wordLists[grade]];
-      }
-    }
-    
-    // Shuffle the combined list
-    const shuffled = [...combined];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    
-    return shuffled;
-  };
+  // 7th Grade
+  '7th Grade': ["evaluate", "interpret", "synthesize", "distinguish", "categorize", "classify", "investigate", "hypothesis", "experiment", "method", "metaphor", "simile", "symbolism", "imagery", "mood", "tone", "protagonist", "antagonist", "dialogue", "monologue", "equation", "expression", "coefficient", "exponent", "inequality", "coordinate", "slope", "intercept", "probability", "statistics", "medieval", "renaissance", "exploration", "colony", "revolution", "constitution", "amendment", "federal", "state", "judicial", "organism", "cell", "tissue", "organ", "system", "photosynthesis", "respiration", "reproduction", "heredity", "adaptation", "perspective", "bias", "reliable", "credible", "source", "paraphrase", "quotation", "citation", "plagiarism", "thesis", "argument", "counterargument", "transition", "paragraph", "analysis", "interpretation"],
 
-  const startGameFromHighScores = (grade) => {
-    setSelectedGrade(grade);
-    const words = getCombinedWordList(grade);
-    if (words.length === 0) {
-      alert('No words available for this grade level yet.');
-      return;
-    }
-    
-    setGameWords(words);
-    setCurrentWordIndex(0);
-    setStartTime(Date.now());
-    setElapsedTime(0);
-    setCurrentScore(null); // Clear previous score when starting new game
-    setCurrentView('game');
-  };
-  const startGame = () => {
-    if (!selectedGrade) return;
-    
-    const words = getCombinedWordList(selectedGrade);
-    if (words.length === 0) {
-      alert('No words available for this grade level yet.');
-      return;
-    }
-    
-    setGameWords(words);
-    setCurrentWordIndex(0);
-    setStartTime(Date.now());
-    setElapsedTime(0);
-    setCurrentView('game');
-  };
+  // 8th Grade
+  '8th Grade': ["scrutinize", "substantiate", "corroborate", "deduce", "infer", "justify", "refute", "advocate", "critique", "formulate", "allegory", "allusion", "irony", "foreshadowing", "flashback", "satire", "rhetoric", "persuasion", "thesis", "polynomial", "quadratic", "linear", "exponential", "logarithm", "function", "domain", "range", "transformation", "congruent", "nationalism", "imperialism", "industrialization", "urbanization", "immigration", "segregation", "suffrage", "prohibition", "depression", "totalitarian", "molecule", "atom", "element", "compound", "reaction", "catalyst", "solution", "mixture", "periodic", "isotope", "methodology", "validity", "reliability", "control", "correlation", "causation", "assumption", "implication", "significance", "evaluation", "assessment", "criteria", "procedure", "technique", "strategy", "approach"],
 
-  const goToNextWord = () => {
-    if (currentWordIndex < gameWords.length - 1) {
-      setCurrentWordIndex(currentWordIndex + 1);
-    } else {
-      // Game completed
-      const finalTime = Date.now() - startTime;
-      setCompletionTime(finalTime);
-      checkHighScore(finalTime);
-    }
-  };
+  // 9th Grade
+  '9th Grade': ["extrapolate", "interpolate", "juxtapose", "contextualize", "conceptualize", "theorize", "hypothesize", "rationalize", "archetype", "motif", "paradox", "oxymoron", "synecdoche", "metonymy", "euphemism", "hyperbole", "understatement", "characterization", "trigonometry", "calculus", "derivative", "integral", "asymptote", "parabola", "ellipse", "hyperbola", "matrix", "vector", "hegemony", "sovereignty", "autonomy", "ideology", "propaganda", "apartheid", "genocide", "diaspora", "assimilation", "pluralism", "equilibrium", "entropy", "stoichiometry", "electronegativity", "oxidation", "reduction", "thermodynamics", "kinetics", "nuclear", "radioactive", "epistemology", "ontology", "paradigm", "dialectic", "empirical", "theoretical", "abstract", "concrete", "subjective", "objective", "synthesis", "methodology", "framework", "concept", "theory", "principle"],
 
-  const goToPrevWord = () => {
-    if (currentWordIndex > 0) {
-      setCurrentWordIndex(currentWordIndex - 1);
-    }
-  };
+  // 10th Grade
+  '10th Grade': ["elucidate", "corroborate", "delineate", "articulate", "postulate", "bildungsroman", "epistolary", "picaresque", "verisimilitude", "catharsis", "denouement", "exposition", "peripeteia", "anagnorisis", "logarithmic", "polynomial", "rational", "irrational", "transcendental", "infinitesimal", "convergent", "divergent", "continuous", "totalitarianism", "authoritarianism", "fascism", "communism", "capitalism", "socialism", "imperialism", "colonialism", "neocolonialism", "globalization", "quantum", "relativity", "electromagnetic", "molecular", "biochemistry", "genetics", "biotechnology", "nanotechnology", "existentialism", "nihilism", "determinism", "relativism", "empiricism", "rationalism", "phenomenology", "hermeneutics", "metaphysics", "juxtaposition", "contextualization", "comprehensive", "sophisticated", "nuanced"],
 
-  const checkHighScore = (finalTime) => {
-    const gradeScores = highScores[selectedGrade] || [];
-    const newScore = {
-      name: '',
-      date: new Date().toLocaleDateString(),
-      wordsCompleted: gameWords.length,
-      timeCompleted: finalTime
-    };
+  // 11th Grade
+  '11th Grade': ["aberration", "accolade", "accommodate", "aesthetic", "affinity", "altercation", "ameliorate", "amicable", "anarchy", "anomaly", "appall", "archaic", "arduous", "astute", "authoritarian", "aversion", "biased", "brevity", "cajole", "callous", "capitulate", "catalyst", "caustic", "censure", "chastise", "clamor", "coalesce", "cognizant", "commiserate", "composure", "conciliatory", "copious", "cordial", "dearth", "debilitate", "decadence", "deference", "deprecate", "despot", "devious", "didactic", "disparage", "dissonance", "duplicity", "edifice", "effervescent", "egregious", "elusive", "equivocal", "erroneous", "exemplary", "expedient", "extraneous", "formidable", "frivolous", "grueling", "haphazard", "heretic", "hindrance", "hypocrisy", "iconoclast", "incessant", "incidental", "incite", "incorrigible", "indoctrinate", "insurgent", "intangible", "judicious", "lavish", "listless", "meager", "meander", "negligent", "obliterate", "ponderous", "preclude", "prerequisite", "proximity", "rectify", "rescind", "resolution", "rigorous", "surmise", "tirade", "turbulence", "unimpeachable", "unobtrusive", "usurp", "vacillate", "whimsical", "accrue", "acquiescent", "acumen", "adage", "adipose", "alchemy", "altruism", "ambiguous", "ambrosia", "benevolent", "bombast", "convalescent", "cryptic", "culmination", "culpable", "curriculum", "deceptive", "delegate", "derogatory", "desolation", "dilettante", "diligent", "disconcert", "disdainfully", "disingenuous", "disperse", "distinction", "distinguished", "dolefully", "dormitory", "earnest", "ecstasy", "egalitarian", "electrify", "eliminate", "embargo", "emphatically", "ennui", "enrapture", "enumerate", "enunciate", "essential", "estimation", "etiquette", "exasperation", "exceedingly", "exceptional", "excitable", "exhibition", "expatiate", "expunged", "extraordinary", "fallacy", "favorably", "fiery", "foreigner", "forfeit", "fragile", "fraught", "futile", "gentleman", "grotesquely", "gymnasium", "harebrained", "havoc", "heroic", "horticulture", "humbug", "humorist", "hybrid", "hygiene", "immense", "impersonal", "implacable", "importune", "impudent", "inability", "inauguration", "incalculable", "incidentally", "inclement", "incredulously", "indispensable", "indoctrination", "ineffectual", "infidel", "inflammatory", "influential", "influx", "innocence", "inquiry", "institute", "intellect", "intensity", "interference", "interloper", "interminable", "intermittently", "interpretation", "interval", "inviolable", "irreparable", "laborious", "laboriously", "lackadaisically", "legendary", "leniently", "liability", "libation", "lifelike", "likelihood", "locally", "luxury", "magnificence", "magnitude", "maintenance", "martyr", "maturity", "meddlesome", "mediation", "merit", "merriment", "miser", "monotony", "municipal", "narrative", "nonchalantly", "occasionally", "occupy", "offensive", "opposition", "optimism", "ordinary", "ornament", "outbreak", "outlive", "outpost", "outreach", "outright", "overdo", "overthrow", "pageant", "pamphlet", "parochial", "paternal", "patronize", "peaceable", "peasant", "peril", "perpetuity", "perplexed", "perseverance", "perspiration", "pertain", "petite", "phase", "philanthropy", "plausible", "playwright", "possibility", "powerless", "practically", "precede", "precisely", "predominant", "prevalent", "primitive", "priority", "privation", "procrastination", "profligate", "profound", "proposition", "prosperous", "prove", "provincial", "psychology", "publicity", "readily", "reciprocity", "recur", "reference", "regard", "rehabilitate", "relic", "religious", "remembrance", "remunerate", "renown", "reparation", "repent", "representative", "repugnant", "requisite", "resistance", "resolutely", "resplendent", "responsibility", "restrictive", "resurgence", "retort", "revel", "revenue", "reverberate", "revile", "ridiculous", "rubble", "sage", "satisfactorily", "scarce", "scoundrel", "scrawny", "security", "sensibility", "serene", "simile", "situated", "skittish", "sleek", "sleuth", "specimen", "spendthrift", "spiritual", "sporadic", "squalor", "squeamish", "stagnant", "stagnate", "stalwart", "stamina", "stately", "steadfast", "stealthy", "stipulate", "strenuous", "stupendous", "sublime", "substantial", "subvert", "successful", "sufficient", "summarize", "supernatural", "supersede", "suppress", "surgeon", "surpass", "surreptitiously", "suspense", "sustenance", "syllable", "symphony", "synonymous", "tactful", "technique", "telepathy", "temperance", "tendency", "terrestrial", "thesaurus", "throng", "tiresome", "toil", "traffic", "transitive", "tribulation", "tyranny", "unanimous", "undaunted", "underrate", "undoubtedly", "unforgettable", "unpleasant", "unseemly", "untenable", "unusually", "uproot", "vengeance", "vexed", "vivacious", "voluminous", "voracious", "warily", "warlike", "whereabouts", "witchcraft", "wrangle"],
 
-    setCurrentScore(newScore);
-
-    // Check if this is a top 5 score
-    if (gradeScores.length < 5 || finalTime < gradeScores[gradeScores.length - 1]?.timeCompleted) {
-      setCurrentView('nameEntry');
-    } else {
-      // Not a high score, go directly to high scores view to show comparison
-      setCurrentView('highscores');
-    }
-  };
-
-  const saveHighScore = () => {
-    if (!playerName.trim()) return;
-
-    const newScore = {
-      name: playerName.trim(),
-      date: new Date().toLocaleDateString(),
-      wordsCompleted: gameWords.length,
-      timeCompleted: completionTime
-    };
-
-    const gradeScores = [...(highScores[selectedGrade] || [])];
-    gradeScores.push(newScore);
-    gradeScores.sort((a, b) => a.timeCompleted - b.timeCompleted);
-    gradeScores.splice(5); // Keep only top 5
-
-    const newHighScores = { ...highScores };
-    newHighScores[selectedGrade] = gradeScores;
-    setHighScores(newHighScores);
-
-    // Save to localStorage (simulating local storage)
-    try {
-      localStorage.setItem(`highScores_${selectedGrade}`, JSON.stringify(gradeScores));
-    } catch (e) {
-      // Handle localStorage not available
-    }
-
-    // Update current score with name and go to high scores
-    setCurrentScore(newScore);
-    setPlayerName('');
-    setCurrentView('highscores');
-  };
-
-  const MenuView = () => (
-    <div className="min-h-screen bg-gradient-to-b from-blue-400 to-purple-500 flex flex-col items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
-        <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">Sight Words</h1>
-        
-        <div className="space-y-6">
-          <div>
-            <label className="block text-lg font-medium text-gray-700 mb-2">Select Grade Level:</label>
-            <select 
-              value={selectedGrade}
-              onChange={(e) => setSelectedGrade(e.target.value)}
-              className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg focus:border-blue-500 focus:outline-none"
-            >
-              <option value="">Choose a grade...</option>
-              {gradeOrder.filter(grade => {
-                const words = getCombinedWordList(grade);
-                return words.length > 0;
-              }).map(grade => (
-                <option key={grade} value={grade}>{grade}</option>
-              ))}
-            </select>
-          </div>
-
-          {selectedGrade && (
-            <div className="text-center text-gray-600">
-              <p>{getCombinedWordList(selectedGrade).length} words to practice</p>
-            </div>
-          )}
-
-          <button
-            onClick={startGame}
-            disabled={!selectedGrade}
-            className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white font-bold py-4 px-6 rounded-lg text-xl flex items-center justify-center gap-2 transition-colors"
-          >
-            <Play size={24} />
-            Start Practice
-          </button>
-
-          <button
-            onClick={() => setCurrentView('review')}
-            disabled={!selectedGrade}
-            className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white font-bold py-4 px-6 rounded-lg text-xl flex items-center justify-center gap-2 transition-colors"
-          >
-            <BookOpen size={24} />
-            Review Words
-          </button>
-
-          <button
-            onClick={() => setCurrentView('highscores')}
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 px-6 rounded-lg text-xl flex items-center justify-center gap-2 transition-colors"
-          >
-            <Trophy size={24} />
-            High Scores
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
-  const GameView = () => {
-    const currentWord = gameWords[currentWordIndex];
-    const progressPercent = Math.round(((currentWordIndex + 1) / gameWords.length) * 100);
-
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-green-400 to-blue-500 flex flex-col">
-        {/* Top Bar */}
-        <div className="flex justify-between items-center p-4 bg-white bg-opacity-20">
-          <div className="text-white font-bold text-lg">
-            {currentWordIndex + 1}/{gameWords.length}
-          </div>
-          <div className="text-white font-bold text-xl">
-            {progressPercent}%
-          </div>
-          <div className="text-white font-bold text-lg">
-            {formatTime(elapsedTime)}
-          </div>
-        </div>
-
-        {/* Word Card */}
-        <div className="flex-1 flex items-center justify-center p-8">
-          <div className="bg-white rounded-3xl shadow-2xl p-16 max-w-2xl w-full text-center">
-            <div className="text-8xl font-bold text-gray-800 leading-none">
-              {currentWord}
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Navigation */}
-        <div className="flex justify-between items-center p-4">
-          <button
-            onClick={goToPrevWord}
-            disabled={currentWordIndex === 0}
-            className="bg-white bg-opacity-20 hover:bg-opacity-30 disabled:opacity-50 text-white p-4 rounded-full transition-all"
-          >
-            <ChevronLeft size={32} />
-          </button>
-
-          <button
-            onClick={() => setCurrentView('menu')}
-            className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-bold transition-colors"
-          >
-            <Home size={24} />
-          </button>
-
-          <button
-            onClick={goToNextWord}
-            className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-4 rounded-full transition-all"
-          >
-            <ChevronRight size={32} />
-          </button>
-        </div>
-      </div>
-    );
-  };
-
-  const HighScoresView = () => (
-    <div className="min-h-screen bg-gradient-to-b from-purple-400 to-pink-500 p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-3xl shadow-2xl p-8">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold text-gray-800">High Scores</h1>
-            <button
-              onClick={() => {
-                setCurrentScore(null);
-                setCurrentView('menu');
-              }}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold transition-colors"
-            >
-              Back to Menu
-            </button>
-          </div>
-
-          {/* Show current score comparison if available */}
-          {currentScore && (
-            <div className="mb-6 p-4 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
-              <h2 className="text-lg font-semibold text-yellow-800 mb-2">🎯 Your Recent Score</h2>
-              <div className="bg-yellow-100 rounded-lg p-3 flex justify-between items-center">
-                <div>
-                  <div className="font-bold text-gray-800">
-                    {currentScore.name || 'Your Score'} - {selectedGrade}
-                  </div>
-                  <div className="text-sm text-gray-600">{currentScore.date}</div>
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-yellow-600">{formatTime(currentScore.timeCompleted)}</div>
-                  <div className="text-sm text-gray-600">{currentScore.wordsCompleted} words</div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="grid gap-6 md:grid-cols-2">
-            {gradeOrder.filter(grade => {
-              const words = getCombinedWordList(grade);
-              return words.length > 0;
-            }).map(grade => (
-              <div key={grade} className="bg-gray-50 rounded-xl p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold text-gray-800">{grade}</h2>
-                  <button
-                    onClick={() => startGameFromHighScores(grade)}
-                    className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full transition-colors flex items-center justify-center"
-                    title={`Challenge ${grade}`}
-                  >
-                    <Play size={20} />
-                  </button>
-                </div>
-                <div className="space-y-2">
-                  {(highScores[grade] || []).map((score, index) => {
-                    // Check if this score matches the current score
-                    const isCurrentScore = currentScore && 
-                      grade === selectedGrade && 
-                      score.timeCompleted === currentScore.timeCompleted &&
-                      score.name === currentScore.name &&
-                      score.date === currentScore.date;
-                    
-                    return (
-                      <div 
-                        key={index} 
-                        className={`rounded-lg p-3 flex justify-between items-center ${
-                          isCurrentScore 
-                            ? 'bg-green-100 border-2 border-green-400' 
-                            : 'bg-white'
-                        }`}
-                      >
-                        <div>
-                          <div className={`font-bold ${isCurrentScore ? 'text-green-800' : 'text-gray-800'}`}>
-                            #{index + 1} {score.name}
-                            {isCurrentScore && ' 🎉'}
-                          </div>
-                          <div className="text-sm text-gray-600">{score.date}</div>
-                        </div>
-                        <div className="text-right">
-                          <div className={`font-bold ${isCurrentScore ? 'text-green-600' : 'text-blue-600'}`}>
-                            {formatTime(score.timeCompleted)}
-                          </div>
-                          <div className="text-sm text-gray-600">{score.wordsCompleted} words</div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {(!highScores[grade] || highScores[grade].length === 0) && (
-                    <div className="text-center text-gray-500 py-4">No scores yet!</div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const ReviewWordsView = () => {
-    const combinedWords = getCombinedWordList(selectedGrade);
-    const wordsByGrade = {};
-    
-    // Organize words by grade level
-    const targetIndex = gradeOrder.indexOf(selectedGrade);
-    for (let i = 0; i <= targetIndex; i++) {
-      const grade = gradeOrder[i];
-      if (wordLists[grade] && wordLists[grade].length > 0) {
-        wordsByGrade[grade] = wordLists[grade];
-      }
-    }
-
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-indigo-400 to-purple-500 p-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-3xl shadow-2xl p-8">
-            <div className="flex items-center justify-between mb-6">
-              <h1 className="text-3xl font-bold text-gray-800">Word Review - {selectedGrade}</h1>
-              <button
-                onClick={() => setCurrentView('menu')}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold transition-colors"
-              >
-                Back to Menu
-              </button>
-            </div>
-
-            <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-              <h2 className="text-lg font-semibold text-blue-800 mb-2">Practice Summary</h2>
-              <p className="text-blue-700">
-                When practicing <strong>{selectedGrade}</strong>, your child will see <strong>{combinedWords.length} total words</strong> from all grade levels up to and including {selectedGrade}.
-              </p>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {Object.entries(wordsByGrade).map(([grade, words]) => (
-                <div key={grade} className="bg-gray-50 rounded-xl p-4">
-                  <h2 className="text-xl font-bold text-gray-800 mb-4 text-center bg-white py-2 rounded-lg">
-                    {grade}
-                  </h2>
-                  <div className="text-sm text-gray-600 text-center mb-3">
-                    {words.length} words
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 max-h-96 overflow-y-auto">
-                    {words.map((word, index) => (
-                      <div key={index} className="bg-white rounded-lg p-2 text-center font-medium text-gray-800 text-sm">
-                        {word}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-8 p-4 bg-green-50 rounded-lg">
-              <h3 className="text-lg font-semibold text-green-800 mb-2">💡 Parent Tip</h3>
-              <p className="text-green-700">
-                These sight words are high-frequency words that children encounter often in reading. 
-                Mastering them helps improve reading fluency and comprehension. Practice regularly 
-                and celebrate progress!
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const NameEntryView = () => (
-    <div className="min-h-screen bg-gradient-to-b from-yellow-400 to-orange-500 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
-        <div className="text-6xl mb-4">🎉</div>
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">Congratulations!</h1>
-        <p className="text-lg text-gray-600 mb-6">
-          You made it to the top 5 for {selectedGrade}!
-        </p>
-        <p className="text-md text-gray-600 mb-6">
-          Time: {formatTime(completionTime)} | Words: {gameWords.length}
-        </p>
-        
-        <div className="space-y-4">
-          <input
-            ref={nameInputRef}
-            type="text"
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && playerName.trim() && saveHighScore()}
-            placeholder="Enter your name"
-            className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg focus:border-blue-500 focus:outline-none"
-            maxLength={20}
-            autoFocus
-          />
-          
-          <div className="flex gap-4">
-            <button
-              onClick={saveHighScore}
-              disabled={!playerName.trim()}
-              className="flex-1 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white font-bold py-3 px-6 rounded-lg transition-colors"
-            >
-              Save Score
-            </button>
-            <button
-              onClick={() => setCurrentView('menu')}
-              className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
-            >
-              Skip
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  return (
-    <div className="font-sans">
-      {currentView === 'menu' && <MenuView />}
-      {currentView === 'game' && <GameView />}
-      {currentView === 'highscores' && <HighScoresView />}
-      {currentView === 'review' && <ReviewWordsView />}
-      {currentView === 'nameEntry' && <NameEntryView />}
-    </div>
-  );
+  // 12th Grade
+  '12th Grade': ["anachronistic", "abbreviate", "abdicate", "abstinence", "adulation", "adversity", "anecdote", "anonymous", "arid", "assiduous", "asylum", "camaraderie", "circuitous", "clairvoyant", "collaborate", "compassion", "compromise", "condescending", "conditional", "conformist", "congregation", "convergence", "deleterious", "demagogue", "digression", "discredit", "disdain", "divergent", "empathy", "emulate", "enervating", "enhance", "ephemeral", "evanescent", "extenuating", "florid", "fortuitous", "frugal", "hackneyed", "haughty", "hedonist", "impetuous", "impute", "incompatible", "inconsequential", "inevitable", "integrity", "intrepid", "intuitive", "jubilation", "lobbyist", "longevity", "mundane", "nonchalant", "novice", "opulent", "orator", "ostentatious", "parched", "perfidious", "precocious", "pretentious", "procrastinate", "prosaic", "prosperity", "provocative", "prudent", "querulous", "rancorous", "reclusive", "reconciliation", "renovation", "resilient", "restrained", "reverence", "sagacity", "scrutinize", "spontaneity", "spurious", "submissive", "superficial", "superfluous", "surreptitious", "tenacious", "transient", "venerable", "vindicate", "wary", "zealot", "abate", "abject", "abstruse", "abysmal", "acerbic", "acquiesce", "acrimonious", "adept", "admonish", "affectation", "aggregate", "allure", "ambience", "amphitheater", "annihilate", "annul", "antithesis", "apathetic", "apex", "aphorism", "appalling", "ardent", "atrocious", "august", "auspicious", "authoritative", "automation", "avow", "banal", "befall", "bland", "blasphemy", "blurb", "bogus", "bourgeois", "brandish", "broach", "bureaucracy", "callow", "cancellation", "candor", "capillary", "capricious", "carnivorous", "castigate", "cater", "catholic", "celibacy", "cervical", "chagrin", "charisma", "charlatan", "choleric", "choreography", "chronic", "circumspect", "clarion", "clemency", "clientele", "colleague", "collegiate", "communicable", "complicity", "component", "compression", "concept", "conclusive", "concord", "concurrence", "concurrent", "condone", "confound", "conjure", "consecrate", "consul", "consultant", "contemptuous", "contentious", "continuance", "contradictory", "conveyance", "convivial", "convulsion", "cosmic", "covert", "credentials", "creditor", "crucial", "crypt", "culminate", "cumulative", "curtail", "curvature", "cynic", "cynical", "daunt", "debit", "debutante", "decorous", "default", "deficient", "defile", "definitive", "deflation", "deft", "deity", "delve", "demented", "demolition", "demoralize", "demure", "denigrate", "denizen", "deplorable", "deposition", "depreciate", "derivative", "designate", "deteriorate", "devastate", "dialect", "diaphragm", "dictum", "dignitary", "dilate", "discretion", "disgruntle", "disillusion", "disintegrate", "dispel", "dispensary", "dispense", "displacement", "disquiet", "disreputable", "dissect", "disuse", "diverse", "docile", "dogged", "dogmatic", "domination", "dormant", "dote", "dregs", "droll", "duct", "dupe", "dynamic", "eccentric", "eclectic", "effusion", "egocentric", "elongate", "eloquent", "emancipate", "embellish", "emboss", "embryo", "eminent", "emit", "encampment", "enigma", "ensemble", "enthrall", "entreaty", "epiphany", "epitome", "equanimity", "equivocation", "eradicate", "esteem", "ethical", "evangelical", "evasion", "exacerbate", "expatriate", "expedite", "expressive", "expressly", "extradition", "exuberant", "facetious", "farcical", "feasible", "feign", "ferocity", "ferret", "fidelity", "finale", "finesse", "flail", "flange", "flaunt", "focal", "foible", "folio", "foment", "formulate", "forthright", "forum", "frontage", "froth", "frustrate", "furtive", "gainsay", "gaseous", "genteel", "germinate", "glaze", "glib", "glutton", "grandiose", "granulate", "gratify", "grotesque", "grovel", "guerrilla", "hapless", "heirloom", "heritage", "hew", "hoax", "hovel", "humdrum", "humiliate", "humility", "hypocrite", "hysteria", "idiom", "illegitimate", "illustrious", "impeach", "imperative", "imperial", "impertinent", "impoverish", "impregnate", "inaccessible", "incandescent", "incision", "inclination", "inclusive", "incorporate", "incriminate", "indemnify", "indisposed", "induce", "inducement", "inert", "infatuate", "infernal", "inkling", "innumerable", "inquisitive", "insufferable", "integral", "intolerable", "intolerant", "intuition", "inundate", "invertebrate", "invincible", "invoke", "ire", "irreducible", "jargon", "kinetic", "lateral", "laud", "legacy", "liberalism", "linear", "linguistics", "liquidate", "lucid", "mainstay", "malady", "manipulate", "manor", "materialize", "maternal", "maudlin", "maul", "mechanization", "medley", "mendicant", "metaphysical", "minutiae", "mire", "misconception", "momentum", "morbid", "mutation", "mystical", "narcotic", "narrate", "necessitate", "nefarious", "negotiate", "neural", "nucleus", "obituary", "oblique", "oblivion", "obnoxious", "obscene", "obtuse", "opaque", "optics", "oratory", "ordinance", "organic", "organism", "overture", "pacify", "panorama", "parry", "parse", "passive", "patron", "pensive", "permeate", "personage", "pertinent", "pervasive", "pessimistic", "phenomenal", "pictorial", "pigment", "pilgrimage", "pinnacle", "piteous", "plebeian", "pliable", "populate", "portal", "portly", "precept", "precinct", "pregnant", "prelude", "preoccupy", "prestige", "profess", "proficient", "progression", "prophylactic", "prose", "providence", "pulverize",         "putrid", "qualm", "quandary", "quell", "radiate", "radical", "ratify", "rational", "ravenous", "ravish", "readjust", "rebuff", "rebuke", "recondite", "recuperate", "reformatory", "reimburse", "reinstate", "remittance", "renounce", "renovate", "reorganize", "repercussion", "reprove", "repudiate", "reputable", "residue", "resolute", "respite", "revere", "reverie", "revert", "revoke", "rhapsody", "rift", "ritual", "rogue", "roster", "rostrum", "rue", "sally", "satire", "saturate", "scope", "scrimmage", "sear", "secluded", "sector", "sediment", "segment", "segregate", "silhouette", "simultaneous", "skeptical", "skirmish", "slothful", "smelt", "sodden", "solitude", "solvent", "somber", "spasm", "squander", "stability", "stance", "sterile", "stigma", "stimulate", "stolid", "stupefy", "stupor", "suave", "subside", "sundry", "superimpose", "superlative", "symmetry", "synthetic", "tabulate", "taint", "tangent", "tantalize", "tart", "tawdry", "temperate", "theorem", "tier", "timely", "tolerable", "torrid", "torso", "tout", "transcribe", "transpose", "tributary", "tumult", "ultimate", "ultimatum", "uncouth", "unerring", "unkempt", "usage", "variable", "venerate", "vestige", "vex", "vigil", "vigilant", "vilify", "visualize", "vitality", "volatile", "waif", "wan", "wanton", "wend", "whet", "wistful", "zealous"]
 };
 
-export default SightWordsApp;
+export const gradeOrder = ['Pre-K', 'Kindergarten', '1st Grade', '2nd Grade', '3rd Grade', '4th Grade', '5th Grade', '6th Grade', '7th Grade', '8th Grade', '9th Grade', '10th Grade', '11th Grade', '12th Grade'];
+
+// Utility function to get combined word list up to a target grade
+export const getCombinedWordList = (targetGrade) => {
+  const targetIndex = gradeOrder.indexOf(targetGrade);
+  let combined = [];
+  
+  for (let i = 0; i <= targetIndex; i++) {
+    const grade = gradeOrder[i];
+    if (wordLists[grade] && wordLists[grade].length > 0) {
+      combined = [...combined, ...wordLists[grade]];
+    }
+  }
+  
+  // Shuffle the combined list
+  const shuffled = [...combined];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  
+  return shuffled;
+};
+
+// Utility function to get words organized by grade for review
+export const getWordsByGrade = (targetGrade) => {
+  const wordsByGrade = {};
+  const targetIndex = gradeOrder.indexOf(targetGrade);
+  
+  for (let i = 0; i <= targetIndex; i++) {
+    const grade = gradeOrder[i];
+    if (wordLists[grade] && wordLists[grade].length > 0) {
+      wordsByGrade[grade] = wordLists[grade];
+    }
+  }
+  
+  return wordsByGrade;
+};

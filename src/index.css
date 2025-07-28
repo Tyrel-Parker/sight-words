@@ -2,71 +2,98 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Safe area styles for mobile devices */
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+@supports (height: 100dvh) {
+  .dvh-full {
+    height: 100dvh;
+  }
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+/* Fixed navigation button styles - No hover effects to prevent flickering */
+.nav-button {
+  /* Improved touch and click handling */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  
+  /* Prevent flickering and improve responsiveness */
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* NO TRANSITIONS - this prevents flickering */
+  transition: none;
+  
+  /* Ensure button has a stable hit area */
+  min-width: 44px;
+  min-height: 44px;
+  
+  /* Prevent double-tap zoom on iOS */
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  
+  /* Force hardware acceleration */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: auto;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+.nav-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* NO ACTIVE OR HOVER STATES - prevents all flickering */
+.nav-button:not(:disabled):active,
+.nav-button:not(:disabled):hover {
+  /* Keep the same appearance */
+}
+
+/* Ensure child elements don't interfere with clicks */
+.nav-button * {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Specific styles for the white navigation buttons - STATIC ONLY */
+.nav-button-white {
+  background-color: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Specific styles for the red menu button - STATIC ONLY */
+.nav-button-red {
+  background-color: #ef4444;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Additional iOS-specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .nav-button {
+    /* iOS specific optimizations */
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
   }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
+}
+
+/* Ensure buttons work well on all screen sizes */
+@media (max-width: 768px) {
+  .nav-button {
+    min-width: 48px;
+    min-height: 48px;
   }
 }
