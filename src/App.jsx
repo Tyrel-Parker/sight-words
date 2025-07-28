@@ -14,6 +14,7 @@ const SightWordsApp = () => {
   const [completionTime, setCompletionTime] = useState(0);
   const [playerName, setPlayerName] = useState('');
   const [currentScore, setCurrentScore] = useState(null);
+  const [isEditingHighScores, setIsEditingHighScores] = useState(false);
   const nameInputRef = useRef(null);
 
   // Load high scores and last selected grade from localStorage on component mount
@@ -369,15 +370,28 @@ const SightWordsApp = () => {
         <div className="bg-white rounded-3xl shadow-2xl p-8">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl font-bold text-gray-800">High Scores</h1>
-            <button
-              onClick={() => {
-                setCurrentScore(null);
-                setCurrentView('menu');
-              }}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold transition-colors"
-            >
-              Back to Menu
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setIsEditingHighScores(!isEditingHighScores)}
+                className={`px-4 py-2 rounded-lg font-bold transition-colors ${
+                  isEditingHighScores 
+                    ? 'bg-red-500 hover:bg-red-600 text-white' 
+                    : 'bg-gray-500 hover:bg-gray-600 text-white'
+                }`}
+              >
+                {isEditingHighScores ? 'Done Editing' : 'Edit'}
+              </button>
+              <button
+                onClick={() => {
+                  setCurrentScore(null);
+                  setIsEditingHighScores(false);
+                  setCurrentView('menu');
+                }}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold transition-colors"
+              >
+                Back to Menu
+              </button>
+            </div>
           </div>
 
           {/* Show current score comparison if available */}
@@ -447,13 +461,15 @@ const SightWordsApp = () => {
                             </div>
                             <div className="text-sm text-gray-600">{score.wordsCompleted} words</div>
                           </div>
-                          <button
-                            onClick={() => deleteHighScore(grade, index)}
-                            className="bg-red-500 hover:bg-red-600 text-white p-1 rounded transition-colors"
-                            title="Delete this score"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          {isEditingHighScores && (
+                            <button
+                              onClick={() => deleteHighScore(grade, index)}
+                              className="bg-red-500 hover:bg-red-600 text-white p-1 rounded transition-colors flex items-center justify-center"
+                              title="Delete this score"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          )}
                         </div>
                       </div>
                     );
