@@ -245,8 +245,13 @@ const SightWordsApp = () => {
           </div>
 
           {selectedGrade && (
-            <div className="text-center text-gray-600">
-              <p>{getCombinedWordList(selectedGrade).length} words to practice</p>
+            <div className="text-center text-gray-600 space-y-1">
+              <p className="text-sm">
+                <span className="font-medium text-blue-600">{wordLists[selectedGrade]?.length || 0}</span> new words in {selectedGrade}
+              </p>
+              <p className="text-base font-medium">
+                <span className="text-green-600">{getCombinedWordList(selectedGrade).length}</span> total words to practice
+              </p>
             </div>
           )}
 
