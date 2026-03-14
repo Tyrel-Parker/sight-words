@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Trophy, Home, Play, BookOpen, Trash2 } from 'lucide-react';
-import { wordLists, gradeOrder, getCombinedWordList, getWordsByGrade } from './words.jsx';
+import { gradeOrder, getCombinedWordList, getWordsByGrade } from './words.jsx';
 
 const SightWordsApp = () => {
 
@@ -15,6 +15,7 @@ const SightWordsApp = () => {
   const [playerName, setPlayerName] = useState('');
   const [currentScore, setCurrentScore] = useState(null);
   const [isEditingHighScores, setIsEditingHighScores] = useState(false);
+  const [selectedWordCount, setSelectedWordCount] = useState('all');
   const nameInputRef = useRef(null);
 
   // Load high scores and last selected grade from localStorage on component mount
@@ -72,6 +73,18 @@ const SightWordsApp = () => {
     }
   }, [currentView]);
 
+  const getAvgTimePerWord = (score) => score.timeCompleted / score.wordsCompleted;
+
+  const formatAvgTime = (score) => {
+    const avgMs = getAvgTimePerWord(score);
+    return `${(avgMs / 1000).toFixed(2)}s/word`;
+  };
+
+  const getWordCountOptions = (total) => {
+    const presets = [10, 15, 20, 25, 30, 40, 50, 75, 100, 125, 150];
+    return presets.filter(n => n < total);
+  };
+
   const formatTime = (ms) => {
     const seconds = Math.floor(ms / 1000);
     const minutes = Math.floor(seconds / 60);
@@ -87,12 +100,16 @@ const SightWordsApp = () => {
   const startGame = () => {
     if (!selectedGrade) return;
     
-    const words = getCombinedWordList(selectedGrade);
+    let words = getCombinedWordList(selectedGrade);
     if (words.length === 0) {
       alert('No words available for this grade level yet.');
       return;
     }
-    
+
+    if (selectedWordCount !== 'all') {
+      words = words.slice(0, Math.min(selectedWordCount, words.length));
+    }
+
     setGameWords(words);
     setCurrentWordIndex(0);
     setStartTime(Date.now());
@@ -102,6 +119,7 @@ const SightWordsApp = () => {
 
   const startGameFromHighScores = (grade) => {
     setSelectedGrade(grade);
+    setSelectedWordCount('all');
     const words = getCombinedWordList(grade);
     if (words.length === 0) {
       alert('No words available for this grade level yet.');
@@ -187,8 +205,10 @@ const SightWordsApp = () => {
 
     setCurrentScore(newScore);
 
-    // Check if this is a top 5 score
-    if (gradeScores.length < 5 || finalTime < gradeScores[gradeScores.length - 1]?.timeCompleted) {
+    // Check if this is a top 5 score (by avg time per word)
+    const avgTime = finalTime / gameWords.length;
+    const worstAvg = gradeScores.length > 0 ? getAvgTimePerWord(gradeScores[gradeScores.length - 1]) : Infinity;
+    if (gradeScores.length < 5 || avgTime < worstAvg) {
       setCurrentView('nameEntry');
     } else {
       // Not a high score, go directly to high scores view to show comparison
@@ -208,7 +228,7 @@ const SightWordsApp = () => {
 
     const gradeScores = [...(highScores[selectedGrade] || [])];
     gradeScores.push(newScore);
-    gradeScores.sort((a, b) => a.timeCompleted - b.timeCompleted);
+    gradeScores.sort((a, b) => getAvgTimePerWord(a) - getAvgTimePerWord(b));
     gradeScores.splice(5); // Keep only top 5
 
     const newHighScores = { ...highScores };
@@ -254,7 +274,7 @@ const SightWordsApp = () => {
             <label className="block text-lg font-medium text-gray-700 mb-2">Select Grade Level:</label>
             <select 
               value={selectedGrade}
-              onChange={(e) => setSelectedGrade(e.target.value)}
+              onChange={(e) => { setSelectedGrade(e.target.value); setSelectedWordCount('all'); }}
               className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg focus:border-blue-500 focus:outline-none"
             >
               <option value="">Choose a grade...</option>
@@ -267,16 +287,26 @@ const SightWordsApp = () => {
             </select>
           </div>
 
-          {selectedGrade && (
-            <div className="text-center text-gray-600 space-y-1">
-              <p className="text-sm">
-                <span className="font-medium text-blue-600">{wordLists[selectedGrade]?.length || 0}</span> new words in {selectedGrade}
-              </p>
-              <p className="text-base font-medium">
-                <span className="text-green-600">{getCombinedWordList(selectedGrade).length}</span> total words to practice
-              </p>
-            </div>
-          )}
+          {selectedGrade && (() => {
+            const totalWords = getCombinedWordList(selectedGrade).length;
+            const practiceCount = selectedWordCount === 'all' ? totalWords : Math.min(selectedWordCount, totalWords);
+            return (
+              <div>
+                <label className="block text-lg font-medium text-gray-700 mb-2">Number of words:</label>
+                <select
+                  value={selectedWordCount === 'all' ? 'all' : String(selectedWordCount)}
+                  onChange={(e) => setSelectedWordCount(e.target.value === 'all' ? 'all' : parseInt(e.target.value))}
+                  className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg focus:border-blue-500 focus:outline-none"
+                >
+                  {getWordCountOptions(totalWords).map(n => (
+                    <option key={n} value={String(n)}>{n} words</option>
+                  ))}
+                  <option value="all">All ({totalWords} words)</option>
+                </select>
+                <p className="text-center text-gray-500 text-sm mt-2">{practiceCount} words selected</p>
+              </div>
+            );
+          })()}
 
           <button
             onClick={startGame}
@@ -425,8 +455,8 @@ const SightWordsApp = () => {
                   <div className="text-sm text-gray-600">{currentScore.date}</div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-yellow-600">{formatTime(currentScore.timeCompleted)}</div>
-                  <div className="text-sm text-gray-600">{currentScore.wordsCompleted} words</div>
+                  <div className="font-bold text-yellow-600">{formatAvgTime(currentScore)}</div>
+                  <div className="text-sm text-gray-600">{currentScore.wordsCompleted} words · {formatTime(currentScore.timeCompleted)}</div>
                 </div>
               </div>
             </div>
@@ -476,9 +506,9 @@ const SightWordsApp = () => {
                         <div className="flex items-center gap-3">
                           <div className="text-right">
                             <div className={`font-bold ${isCurrentScore ? 'text-green-600' : 'text-blue-600'}`}>
-                              {formatTime(score.timeCompleted)}
+                              {formatAvgTime(score)}
                             </div>
-                            <div className="text-sm text-gray-600">{score.wordsCompleted} words</div>
+                            <div className="text-sm text-gray-600">{score.wordsCompleted} words · {formatTime(score.timeCompleted)}</div>
                           </div>
                           {isEditingHighScores && (
                             <button
@@ -570,7 +600,7 @@ const SightWordsApp = () => {
           You made it to the top 5 for {selectedGrade}!
         </p>
         <p className="text-md text-gray-600 mb-6">
-          Time: {formatTime(completionTime)} | Words: {gameWords.length}
+          {formatAvgTime({ timeCompleted: completionTime, wordsCompleted: gameWords.length })} · {gameWords.length} words · {formatTime(completionTime)}
         </p>
         
         <div className="space-y-4">
