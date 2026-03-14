@@ -264,79 +264,113 @@ const SightWordsApp = () => {
     }
   };
 
-  const MenuView = () => (
-    <div className="min-h-screen bg-gradient-to-b from-blue-400 to-purple-500 flex flex-col items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
-        <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">Sight Words</h1>
-        
-        <div className="space-y-6">
-          <div>
-            <label className="block text-lg font-medium text-gray-700 mb-2">Select Grade Level:</label>
-            <select 
-              value={selectedGrade}
-              onChange={(e) => { setSelectedGrade(e.target.value); setSelectedWordCount('all'); }}
-              className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg focus:border-blue-500 focus:outline-none"
+  const MenuView = () => {
+    const gradesWithScores = gradeOrder.filter(grade => highScores[grade]?.length > 0);
+
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-blue-400 to-purple-500 flex flex-col md:flex-row items-center md:items-start justify-center gap-6 p-4 md:p-8">
+        {/* Main card */}
+        <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md md:flex-shrink-0">
+          <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">Sight Words</h1>
+
+          <div className="space-y-6">
+            <div>
+              <label className="block text-lg font-medium text-gray-700 mb-2">Select Grade Level:</label>
+              <select
+                value={selectedGrade}
+                onChange={(e) => { setSelectedGrade(e.target.value); setSelectedWordCount('all'); }}
+                className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg focus:border-blue-500 focus:outline-none"
+              >
+                <option value="">Choose a grade...</option>
+                {gradeOrder.filter(grade => {
+                  const words = getCombinedWordList(grade);
+                  return words.length > 0;
+                }).map(grade => (
+                  <option key={grade} value={grade}>{grade}</option>
+                ))}
+              </select>
+            </div>
+
+            {selectedGrade && (() => {
+              const totalWords = getCombinedWordList(selectedGrade).length;
+              const practiceCount = selectedWordCount === 'all' ? totalWords : Math.min(selectedWordCount, totalWords);
+              return (
+                <div>
+                  <label className="block text-lg font-medium text-gray-700 mb-2">Number of words:</label>
+                  <select
+                    value={selectedWordCount === 'all' ? 'all' : String(selectedWordCount)}
+                    onChange={(e) => setSelectedWordCount(e.target.value === 'all' ? 'all' : parseInt(e.target.value))}
+                    className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg focus:border-blue-500 focus:outline-none"
+                  >
+                    {getWordCountOptions(totalWords).map(n => (
+                      <option key={n} value={String(n)}>{n} words</option>
+                    ))}
+                    <option value="all">All ({totalWords} words)</option>
+                  </select>
+                  <p className="text-center text-gray-500 text-sm mt-2">{practiceCount} words selected</p>
+                </div>
+              );
+            })()}
+
+            <button
+              onClick={startGame}
+              disabled={!selectedGrade}
+              className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white font-bold py-4 px-6 rounded-lg text-xl flex items-center justify-center gap-2 transition-colors"
             >
-              <option value="">Choose a grade...</option>
-              {gradeOrder.filter(grade => {
-                const words = getCombinedWordList(grade);
-                return words.length > 0;
-              }).map(grade => (
-                <option key={grade} value={grade}>{grade}</option>
-              ))}
-            </select>
+              <Play size={24} />
+              Start Practice
+            </button>
+
+            <button
+              onClick={() => setCurrentView('review')}
+              disabled={!selectedGrade}
+              className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white font-bold py-4 px-6 rounded-lg text-xl flex items-center justify-center gap-2 transition-colors"
+            >
+              <BookOpen size={24} />
+              Review Words
+            </button>
+
+            <button
+              onClick={() => setCurrentView('highscores')}
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 px-6 rounded-lg text-xl flex items-center justify-center gap-2 transition-colors"
+            >
+              <Trophy size={24} />
+              High Scores
+            </button>
           </div>
-
-          {selectedGrade && (() => {
-            const totalWords = getCombinedWordList(selectedGrade).length;
-            const practiceCount = selectedWordCount === 'all' ? totalWords : Math.min(selectedWordCount, totalWords);
-            return (
-              <div>
-                <label className="block text-lg font-medium text-gray-700 mb-2">Number of words:</label>
-                <select
-                  value={selectedWordCount === 'all' ? 'all' : String(selectedWordCount)}
-                  onChange={(e) => setSelectedWordCount(e.target.value === 'all' ? 'all' : parseInt(e.target.value))}
-                  className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg focus:border-blue-500 focus:outline-none"
-                >
-                  {getWordCountOptions(totalWords).map(n => (
-                    <option key={n} value={String(n)}>{n} words</option>
-                  ))}
-                  <option value="all">All ({totalWords} words)</option>
-                </select>
-                <p className="text-center text-gray-500 text-sm mt-2">{practiceCount} words selected</p>
-              </div>
-            );
-          })()}
-
-          <button
-            onClick={startGame}
-            disabled={!selectedGrade}
-            className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white font-bold py-4 px-6 rounded-lg text-xl flex items-center justify-center gap-2 transition-colors"
-          >
-            <Play size={24} />
-            Start Practice
-          </button>
-
-          <button
-            onClick={() => setCurrentView('review')}
-            disabled={!selectedGrade}
-            className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white font-bold py-4 px-6 rounded-lg text-xl flex items-center justify-center gap-2 transition-colors"
-          >
-            <BookOpen size={24} />
-            Review Words
-          </button>
-
-          <button
-            onClick={() => setCurrentView('highscores')}
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 px-6 rounded-lg text-xl flex items-center justify-center gap-2 transition-colors"
-          >
-            <Trophy size={24} />
-            High Scores
-          </button>
         </div>
+
+        {/* Top scores sidebar */}
+        {gradesWithScores.length > 0 && (
+          <div className="bg-white bg-opacity-20 rounded-3xl p-6 w-full max-w-md md:max-w-xs">
+            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <Trophy size={20} />
+              Top Scores
+            </h2>
+            <div className="space-y-3">
+              {gradesWithScores.map(grade => {
+                const top = highScores[grade][0];
+                return (
+                  <div key={grade} className="bg-white bg-opacity-90 rounded-xl p-3">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="font-bold text-gray-800 text-sm">{grade}</div>
+                        <div className="text-gray-600 text-sm">{top.name}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-blue-600 text-sm">{formatAvgTime(top)}</div>
+                        <div className="text-gray-500 text-xs">{top.wordsCompleted} words</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   const GameView = () => {
     const currentWord = gameWords[currentWordIndex];
